@@ -1,17 +1,17 @@
 <template>
     <div>
-        <TableFilter />
+        <!-- <TableFilter /> -->
         <ChangesTable />
     </div>
 </template>
 
 <script>
 import ChangesTable from '@/components/ChangesList/ChangesTable/ChangesTable'
-import TableFilter from '@/components/ChangesList/TableFilter/TableFilter'
+// import TableFilter from '@/components/ChangesList/TableFilter/TableFilter'
     export default {
         components:{
             ChangesTable,
-            TableFilter
+            // TableFilter
         }
     }
 </script>

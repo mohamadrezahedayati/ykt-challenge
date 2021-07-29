@@ -1,5 +1,34 @@
 <template>
   <div>
+    <div>
+      <div>
+        <label for="">
+          {{ getTitles.modifierName }}
+        </label>
+        <input
+          type="text"
+          v-model="modifierNameQuery"
+        >
+      </div>
+      <div>
+        <label for="">
+          {{ getTitles.date }}
+        </label>
+        <input type="text" v-model="dateQuery">
+      </div>
+      <div>
+        <label for="">
+          {{ getTitles.adName }}
+        </label>
+        <input type="text" v-model="adNameQuery">
+      </div>
+      <div>
+        <label for="">
+          {{ getTitles.field }}
+        </label>
+        <input type="text" v-model="fieldQuery">
+      </div>
+    </div>
     <div class="headers grid">
       <HeaderItem
         textProperty="modifierName"
@@ -61,6 +90,8 @@
 <script>
 import data from "/data.json";
 import HeaderItem from "./HeaderItem/HeaderItem.vue";
+import resource from "/resource.json";
+
 export default {
   components: {
     HeaderItem,
@@ -72,6 +103,10 @@ export default {
         key: "",
         isAsc: false,
       },
+      modifierNameQuery: "",
+      dateQuery: "",
+      fieldQuery: "",
+      adNameQuery: "",
     };
   },
   computed: {
@@ -84,17 +119,27 @@ export default {
           return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1);
         });
       }
-      return list;
+      return list.filter((item) => {
+        return item
+          ? item.name.toLowerCase().includes(this.modifierNameQuery.toLowerCase()) &&
+            item.date.toLowerCase().includes(this.dateQuery.toLowerCase()) &&
+            item.title.toLowerCase().includes(this.adNameQuery.toLowerCase()) &&
+            item.field.toLowerCase().includes(this.fieldQuery.toLowerCase())
+          : null;
+      });
+    },
+    getTitles() {
+      return resource;
     },
   },
   methods: {
     sortedClass(key) {
-      return this.sort.key === key
-        ? `sorted ${this.sort.isAsc ? "asc" : "desc"}`
-        : "";
+      const isSorted = this.sort.key === key;
+      return isSorted ? `sorted ${this.sort.isAsc ? "asc" : "desc"}` : null;
     },
     sortBy(key) {
-      this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
+      const isSorted = this.sort.key === key;
+      this.sort.isAsc = isSorted ? !this.sort.isAsc : false;
       this.sort.key = key;
     },
   },
