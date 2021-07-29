@@ -1,16 +1,16 @@
 <template>
     <div>
-        <ChangeTable />
         <TableFilter />
+        <ChangesTable />
     </div>
 </template>
 
 <script>
-import ChangeTable from '@/components/ChangesList/ChangeTable/ChangeTable'
+import ChangesTable from '@/components/ChangesList/ChangesTable/ChangesTable'
 import TableFilter from '@/components/ChangesList/TableFilter/TableFilter'
     export default {
         components:{
-            ChangeTable,
+            ChangesTable,
             TableFilter
         }
     }
