@@ -86,13 +86,16 @@
           :active="active"
           :data-index="index"
         >
-          <div class="grid">
+          <div class="grid" @click="addStarToLine(item)">
             <div class="table-cell">{{ item.name }}</div>
             <div class="table-cell">{{ item.date }}</div>
             <div class="table-cell">{{ item.title }}</div>
             <div class="table-cell">{{ item.field }}</div>
             <div class="table-cell">{{ item.old_value }}</div>
             <div class="table-cell">{{ item.new_value }}</div>
+            <div class="star" v-if="item.hasStar">
+              <img src="@/assets/icon-star.png" alt="">
+            </div>
           </div>
         </DynamicScrollerItem>
       </template>
@@ -120,6 +123,9 @@ export default {
       dateQuery: "",
       fieldQuery: "",
       adNameQuery: "",
+      starredItems: JSON.parse(localStorage.getItem("starredItems"))
+        ? new Set([...JSON.parse(localStorage.getItem("starredItems"))])
+        : new Set(),
     };
   },
   computed: {
@@ -138,6 +144,7 @@ export default {
   created() {
     this.initialValueFilters();
     this.initialValueSorts();
+    this.showStarredItems();
   },
   methods: {
     sortedClass(col) {
@@ -197,6 +204,21 @@ export default {
       if (title) this.adNameQuery = title;
       if (field) this.fieldQuery = field;
     },
+    addStarToLine(item) {
+      item.hasStar = true;
+      this.starredItems.add(item.id);
+      localStorage.setItem(
+        "starredItems",
+        JSON.stringify([...this.starredItems])
+      );
+    },
+    showStarredItems() {
+      const starredIdsList = JSON.parse(localStorage.getItem("starredItems"));
+      starredIdsList?.forEach((id) => {
+        const item = this.list.find((item) => item.id == id);
+        item.hasStar = true;
+      });
+    },
   },
 };
 </script>
@@ -213,6 +235,7 @@ export default {
   grid-template-columns: minmax(100px, 200px) 1fr 2fr 1fr 2fr 3fr;
   border-top: 1px solid black;
   border-right: 1px solid black;
+  position: relative;
   .table-cell {
     padding: 8px 4px;
     border-left: 1px solid black;
@@ -229,5 +252,13 @@ export default {
     display: inline-block;
     content: "▲";
   }
+}
+.star {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
 }
 </style>
