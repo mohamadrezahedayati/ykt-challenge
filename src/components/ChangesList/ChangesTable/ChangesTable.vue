@@ -39,7 +39,7 @@
           :active="active"
         >
           <div
-            class="grid"
+            class="list-item"
             @click="addStarToLine(item)"
           >
             <div class="table-cell">{{ item.name }}</div>
@@ -163,31 +163,29 @@ export default {
 <style lang="scss" scoped>
 .container-filters {
   display: grid;
-  grid-auto-flow: column;
   direction: rtl;
   padding: 1rem 0.25rem;
   column-gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(20%, 1fr));
   .filter-item {
     display: flex;
     flex-direction: column;
   }
 }
-.headers {
-  background-color: rgb(226, 241, 87);
-}
 
-.grid {
-  direction: rtl;
-  text-align: center;
-  display: grid;
-  grid-template-columns: minmax(100px, 200px) 1fr 2fr 1fr 2fr 3fr;
-  border-top: 1px solid black;
-  border-right: 1px solid black;
-  position: relative;
+.list-item {
+    direction: rtl;
+    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr 1fr 2fr 3fr;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    position: relative;
   .table-cell {
     padding: 8px 4px;
     border-left: 1px solid black;
     border-bottom: 1px solid black;
+    word-break: break-word;
   }
 }
 

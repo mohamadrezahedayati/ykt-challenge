@@ -1,5 +1,5 @@
 <template>
-  <div class="headers grid">
+  <div class="headers">
     <HeaderItem
       textProperty="modifierName"
       :class="sortedClass('name')"
@@ -82,11 +82,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.grid {
+.headers {
+  background-color: rgb(226, 241, 87);
   direction: rtl;
   text-align: center;
   display: grid;
-  grid-template-columns: minmax(100px, 200px) 1fr 2fr 1fr 2fr 3fr;
+  grid-template-columns: 1fr 1fr 2fr 1fr 2fr 3fr;
   border-top: 1px solid black;
   border-right: 1px solid black;
   position: relative;
