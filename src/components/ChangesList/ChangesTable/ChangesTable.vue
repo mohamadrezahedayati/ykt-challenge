@@ -8,25 +8,38 @@
         <input
           type="text"
           v-model="modifierNameQuery"
+          @input="addQueryToRoute({'name':modifierNameQuery})"
         >
       </div>
       <div>
         <label for="">
           {{ getTitles.date }}
         </label>
-        <input type="text" v-model="dateQuery">
+        <input
+          type="text"
+          v-model="dateQuery"
+          @input="addQueryToRoute({'date':dateQuery})"
+        >
       </div>
       <div>
         <label for="">
           {{ getTitles.adName }}
         </label>
-        <input type="text" v-model="adNameQuery">
+        <input
+          type="text"
+          v-model="adNameQuery"
+          @input="addQueryToRoute({'title':adNameQuery})"
+        >
       </div>
       <div>
         <label for="">
           {{ getTitles.field }}
         </label>
-        <input type="text" v-model="fieldQuery">
+        <input
+          type="text"
+          v-model="fieldQuery"
+          @input="addQueryToRoute({'field':fieldQuery})"
+        >
       </div>
     </div>
     <div class="headers grid">
@@ -98,9 +111,9 @@ export default {
   },
   data() {
     return {
-      dataList: data,
+      list: data,
       sort: {
-        key: "",
+        col: "",
         isAsc: false,
       },
       modifierNameQuery: "",
@@ -111,36 +124,78 @@ export default {
   },
   computed: {
     getChangesList() {
-      const list = this.dataList.slice();
-      if (this.sort.key) {
-        list.sort((a, b) => {
-          a = a[this.sort.key];
-          b = b[this.sort.key];
-          return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1);
-        });
-      }
-      return list.filter((item) => {
-        return item
-          ? item.name.toLowerCase().includes(this.modifierNameQuery.toLowerCase()) &&
-            item.date.toLowerCase().includes(this.dateQuery.toLowerCase()) &&
-            item.title.toLowerCase().includes(this.adNameQuery.toLowerCase()) &&
-            item.field.toLowerCase().includes(this.fieldQuery.toLowerCase())
-          : null;
-      });
+      const sortedList = this.getSortedList();
+      const filteredAndSortedList = this.getFilteredList(sortedList);
+      return filteredAndSortedList;
     },
     getTitles() {
       return resource;
     },
+    getCurrentQueriesFromRoute() {
+      return this.$route.query;
+    },
+  },
+  created() {
+    this.initialValueFilters();
+    this.initialValueSorts();
   },
   methods: {
-    sortedClass(key) {
-      const isSorted = this.sort.key === key;
+    sortedClass(col) {
+      const isSorted = this.sort.col === col;
       return isSorted ? `sorted ${this.sort.isAsc ? "asc" : "desc"}` : null;
     },
-    sortBy(key) {
-      const isSorted = this.sort.key === key;
+    sortBy(col) {
+      const isSorted = this.sort.col === col;
       this.sort.isAsc = isSorted ? !this.sort.isAsc : false;
-      this.sort.key = key;
+      this.sort.col = col;
+      this.$router.push({
+        query: Object.assign({}, this.getCurrentQueriesFromRoute, {
+          col: col,
+          isAsc: this.sort.isAsc,
+        }),
+      });
+    },
+    getSortedList() {
+      const list = this.list.slice();
+      if (this.sort.col) {
+        list.sort((a, b) => {
+          a = a[this.sort.col];
+          b = b[this.sort.col];
+          return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1);
+        });
+      }
+      return list;
+    },
+    getFilteredList(list) {
+      return list.filter((item) => {
+        return item
+          ? item.name
+              .toLowerCase()
+              .includes(this.modifierNameQuery.toLowerCase()) &&
+              item.date.toLowerCase().includes(this.dateQuery.toLowerCase()) &&
+              item.title
+                .toLowerCase()
+                .includes(this.adNameQuery.toLowerCase()) &&
+              item.field.toLowerCase().includes(this.fieldQuery.toLowerCase())
+          : null;
+      });
+    },
+    addQueryToRoute(newQuery) {
+      this.$router.push({
+        query: Object.assign({}, this.getCurrentQueriesFromRoute, newQuery),
+      });
+    },
+    initialValueSorts() {
+      const { col, isAsc } = this.getCurrentQueriesFromRoute;
+      if (col) this.sort.col = col;
+      if (isAsc !== undefined) this.sort.isAsc = JSON.parse(isAsc);
+    },
+    initialValueFilters() {
+      const { date, name, title, field } = this.getCurrentQueriesFromRoute;
+      if (date) this.dateQuery = date;
+      if (name) this.modifierNameQuery = name;
+      if (title) this.adNameQuery = title;
+      if (field) this.fieldQuery = field;
     },
   },
 };

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router';
-import {routers} from './routers';
+import {routes} from './routers';
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 Vue.use(VueVirtualScroller)
 
 const router = new VueRouter({
-  routers,
+  routes,
   mode: 'history'
 });
 
