@@ -1,100 +1,62 @@
 <template>
   <div>
-    <div>
-      <div>
-        <label for="">
-          {{ getTitles.modifierName }}
-        </label>
-        <input
-          type="text"
-          v-model="modifierNameQuery"
-          @input="addQueryToRoute({'name':modifierNameQuery})"
-        >
-      </div>
-      <div>
-        <label for="">
-          {{ getTitles.date }}
-        </label>
-        <input
-          type="text"
-          v-model="dateQuery"
-          @input="addQueryToRoute({'date':dateQuery})"
-        >
-      </div>
-      <div>
-        <label for="">
-          {{ getTitles.adName }}
-        </label>
-        <input
-          type="text"
-          v-model="adNameQuery"
-          @input="addQueryToRoute({'title':adNameQuery})"
-        >
-      </div>
-      <div>
-        <label for="">
-          {{ getTitles.field }}
-        </label>
-        <input
-          type="text"
-          v-model="fieldQuery"
-          @input="addQueryToRoute({'field':fieldQuery})"
-        >
-      </div>
-    </div>
-    <div class="headers grid">
-      <HeaderItem
-        textProperty="modifierName"
-        :class="sortedClass('name')"
-        @click.native="sortBy('name')"
+    <div class="container-filters">
+      <BaseInput
+        class="filter-item"
+        :label="getTitles.modifierName"
+        v-model="modifierNameQuery"
+        @input="addQueryToRoute({'name':modifierNameQuery})"
       />
-      <HeaderItem
-        textProperty="date"
-        :class="sortedClass('date')"
-        @click.native="sortBy('date')"
+      <BaseInput
+        class="filter-item"
+        :label="getTitles.date"
+        v-model="dateQuery"
+        @input="addQueryToRoute({'date':dateQuery})"
       />
-      <HeaderItem
-        textProperty="adName"
-        :class="sortedClass('title')"
-        @click.native="sortBy('title')"
+      <BaseInput
+        class="filter-item"
+        :label="getTitles.adName"
+        v-model="adNameQuery"
+        @input="addQueryToRoute({'title':adNameQuery})"
       />
-      <HeaderItem
-        textProperty="field"
-        :class="sortedClass('field')"
-        @click.native="sortBy('field')"
-      />
-      <HeaderItem
-        textProperty="oldValue"
-        :class="sortedClass('old_value')"
-        @click.native="sortBy('old_value')"
-      />
-      <HeaderItem
-        textProperty="newValue"
-        :class="sortedClass('new_value')"
-        @click.native="sortBy('new_value')"
+      <BaseInput
+        class="filter-item"
+        :label="getTitles.field"
+        v-model="fieldQuery"
+        @input="addQueryToRoute({'field':fieldQuery})"
       />
     </div>
+    <Headers @getSorted="setSorted"/>
     <DynamicScroller
       :items="getChangesList"
       :min-item-size="30"
       page-mode
       class="scroller"
     >
-      <template v-slot="{ item, index, active }">
+      <template v-slot="{ item, active }">
         <DynamicScrollerItem
           :item="item"
           :active="active"
-          :data-index="index"
         >
-          <div class="grid" @click="addStarToLine(item)">
+          <div
+            class="grid"
+            @click="addStarToLine(item)"
+          >
             <div class="table-cell">{{ item.name }}</div>
             <div class="table-cell">{{ item.date }}</div>
             <div class="table-cell">{{ item.title }}</div>
             <div class="table-cell">{{ item.field }}</div>
             <div class="table-cell">{{ item.old_value }}</div>
             <div class="table-cell">{{ item.new_value }}</div>
-            <div class="star" v-if="item.hasStar">
-              <img src="@/assets/icon-star.png" alt="">
+            <div
+              class="star"
+              v-if="item.hasStar"
+            >
+              <img
+                src="@/assets/icon-star.png"
+                alt="icon-star"
+                title="icon-star"
+              >
             </div>
           </div>
         </DynamicScrollerItem>
@@ -105,27 +67,24 @@
 
 <script>
 import data from "/data.json";
-import HeaderItem from "./HeaderItem/HeaderItem.vue";
+import Headers from "./Headers/Headers.vue";
 import resource from "/resource.json";
+import BaseInput from "@/components/Base/BaseInput.vue";
 
 export default {
   components: {
-    HeaderItem,
+    Headers,
+    BaseInput,
   },
   data() {
     return {
       list: data,
-      sort: {
-        col: "",
-        isAsc: false,
-      },
+      sort: {},
       modifierNameQuery: "",
       dateQuery: "",
       fieldQuery: "",
       adNameQuery: "",
-      starredItems: JSON.parse(localStorage.getItem("starredItems"))
-        ? new Set([...JSON.parse(localStorage.getItem("starredItems"))])
-        : new Set(),
+      starredItems: JSON.parse(localStorage.getItem("starredItems")) ? new Set([...JSON.parse(localStorage.getItem("starredItems"))]) : new Set(),
     };
   },
   computed: {
@@ -143,25 +102,9 @@ export default {
   },
   created() {
     this.initialValueFilters();
-    this.initialValueSorts();
     this.showStarredItems();
   },
   methods: {
-    sortedClass(col) {
-      const isSorted = this.sort.col === col;
-      return isSorted ? `sorted ${this.sort.isAsc ? "asc" : "desc"}` : null;
-    },
-    sortBy(col) {
-      const isSorted = this.sort.col === col;
-      this.sort.isAsc = isSorted ? !this.sort.isAsc : false;
-      this.sort.col = col;
-      this.$router.push({
-        query: Object.assign({}, this.getCurrentQueriesFromRoute, {
-          col: col,
-          isAsc: this.sort.isAsc,
-        }),
-      });
-    },
     getSortedList() {
       const list = this.list.slice();
       if (this.sort.col) {
@@ -176,13 +119,9 @@ export default {
     getFilteredList(list) {
       return list.filter((item) => {
         return item
-          ? item.name
-              .toLowerCase()
-              .includes(this.modifierNameQuery.toLowerCase()) &&
+          ? item.name.toLowerCase().includes(this.modifierNameQuery.toLowerCase()) &&
               item.date.toLowerCase().includes(this.dateQuery.toLowerCase()) &&
-              item.title
-                .toLowerCase()
-                .includes(this.adNameQuery.toLowerCase()) &&
+              item.title.toLowerCase().includes(this.adNameQuery.toLowerCase()) &&
               item.field.toLowerCase().includes(this.fieldQuery.toLowerCase())
           : null;
       });
@@ -191,11 +130,6 @@ export default {
       this.$router.push({
         query: Object.assign({}, this.getCurrentQueriesFromRoute, newQuery),
       });
-    },
-    initialValueSorts() {
-      const { col, isAsc } = this.getCurrentQueriesFromRoute;
-      if (col) this.sort.col = col;
-      if (isAsc !== undefined) this.sort.isAsc = JSON.parse(isAsc);
     },
     initialValueFilters() {
       const { date, name, title, field } = this.getCurrentQueriesFromRoute;
@@ -219,11 +153,25 @@ export default {
         item.hasStar = true;
       });
     },
+    setSorted(sort){
+      this.sort =sort
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.container-filters {
+  display: grid;
+  grid-auto-flow: column;
+  direction: rtl;
+  padding: 1rem 0.25rem;
+  column-gap: 30px;
+  .filter-item {
+    display: flex;
+    flex-direction: column;
+  }
+}
 .headers {
   background-color: rgb(226, 241, 87);
 }
@@ -243,16 +191,6 @@ export default {
   }
 }
 
-.sorted {
-  &.asc::after {
-    display: inline-block;
-    content: "▼";
-  }
-  &.desc::after {
-    display: inline-block;
-    content: "▲";
-  }
-}
 .star {
   position: absolute;
   top: 7px;
